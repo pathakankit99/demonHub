@@ -173,19 +173,16 @@ const Home = (props: HomeProps) => {
     minutes: any;
     seconds: any;
     completed: any;
-  }) => {
+    }) => {
+    console.log(completed,'completed');
     if (completed) {
-      const disabled =
-        "cursor-not-allowed font-monstmedium text-4xl w-2/3 mx-auto mt-6 h-20 rounded-lg text-white";
-      const notDisabled =
-        "font-monstmedium text-4xl w-2/3 mx-auto mt-6 h-20 rounded-lg bg-pink-500 text-white";
       return (
         <div className=" max-w-lg mx-auto bg-white rounded-lg my-12 w-6/12  border-2 card shadow bg-white">
           <div className="justify-end flex p-3 border-gray-300 border-b pb-2">
-            <div className="hidden flex mr-auto">
+            {/* <div className="hidden flex mr-auto">
               <img src="/star.svg" alt="" className="w-5 mr-2" />
               <div className="my-auto text-gray-600 text-sm">Whitelist</div>
-            </div>
+            </div> */}
             {wallet?.connected && (
               <div className="flex ">
                 <span className="my-auto mr-2 rounded-full h-2 w-2 bg-green-500" />
@@ -207,7 +204,6 @@ const Home = (props: HomeProps) => {
             <hr className="bg-black color-black" />
             <br />
           </div>
-          {console.log(wallet.connected, "connection")}
           <div className="p-6 text-center">
             <div className="flex justify-center items-center">
               <img width={220} src="example.gif" />
@@ -322,12 +318,14 @@ const Home = (props: HomeProps) => {
       );
     } else {
       return (
-        <ReactCountdown
-          days={days}
-          minutes={minutes}
-          hours={hours}
-          seconds={seconds}
-        />
+        <div>
+          <ReactCountdown
+            days={days}
+            minutes={minutes}
+            hours={hours}
+            seconds={seconds}
+          />
+        </div>
       );
     }
   };
@@ -337,21 +335,115 @@ const Home = (props: HomeProps) => {
   return (
     <div>
       <Container style={{ marginTop: 100 }}>
-        {candyMachineGoLive && (
+        {candyMachineGoLive && wallet.connected ? (
           <div className="flex items-center justify-center">
+            <h1>hi</h1>
             <Countdown
               className="flex items-center justify-center"
               date={isSPLExists ? 1640199600000 : candyMachineGoLive}
               renderer={renderer}
             />
           </div>
+        ) : (
+          <div></div>
         )}
-        {!candyMachine && wallet.connected && (
-          <div className="text-white text-center mt-36 mb-6 text-2xl">
-            Loading
+
+        {!candyMachine && wallet?.connected && (
+          <div className=" text-center mt-36 mb-6 text-2xl">Loading</div>
+        )}
+
+        {!wallet.connected && (
+          <div className="flex items-center justify-center">
+            <div className=" max-w-lg mx-auto bg-white rounded-lg my-12 w-6/12  border-2 card shadow bg-white">
+              <div className="justify-end flex p-3 border-gray-300 border-b pb-2">
+                {/* <div className="hidden flex mr-auto">
+              <img src="/star.svg" alt="" className="w-5 mr-2" />
+              <div className="my-auto text-gray-600 text-sm">Whitelist</div>
+            </div> */}
+                {wallet?.connected && (
+                  <div className="flex ">
+                    <span className="my-auto mr-2 rounded-full h-2 w-2 bg-green-500" />
+                    <span className=" my-auto text-gray-600 text-sm">
+                      {" "}
+                      Connected{" "}
+                    </span>
+                  </div>
+                )}
+                {!wallet?.connected && (
+                  <div className="flex ">
+                    <span className="my-auto mr-2 rounded-full h-2 w-2 bg-gray-500" />
+                    <span className=" my-auto text-gray-600 text-sm">
+                      {" "}
+                      Not Connected{" "}
+                    </span>
+                  </div>
+                )}
+                <hr className="bg-black color-black" />
+                <br />
+              </div>
+              <div className="p-6 text-center">
+                <div className="flex justify-center items-center">
+                  <img width={220} src="example.gif" />
+                </div>
+                <h2 className="pt-12 text-lg sm:text-2xl font-mono font-bold py-5 tracking-wider">
+                  Shapes
+                </h2>
+                <p className="text-sm sm:text-md font-semibold pb-5 text-gray-600 ">
+                  A collection of shapes on the blockchain
+                </p>
+                {wallet?.connected ? (
+                  <>
+                    <MintContainer>
+                      {candyMachine?.state.isActive &&
+                      candyMachine?.state.gatekeeper &&
+                      wallet.publicKey &&
+                      wallet.signTransaction ? (
+                        <GatewayProvider
+                          wallet={{
+                            publicKey:
+                              wallet.publicKey ||
+                              new PublicKey(CANDY_MACHINE_PROGRAM),
+                            //@ts-ignore
+                            signTransaction: wallet.signTransaction,
+                          }}
+                          gatekeeperNetwork={
+                            candyMachine?.state?.gatekeeper?.gatekeeperNetwork
+                          }
+                          clusterUrl={rpcUrl}
+                          options={{ autoShowModal: false }}
+                        >
+                          <MintButton
+                            candyMachine={candyMachine}
+                            isMinting={isMinting}
+                            onMint={onMint}
+                          />
+                        </GatewayProvider>
+                      ) : (
+                        <MintButton
+                          candyMachine={candyMachine}
+                          isMinting={isMinting}
+                          onMint={onMint}
+                        />
+                      )}
+                    </MintContainer>
+                  </>
+                ) : (
+                  <div className="bg-indigo-200 p-3 text-indigo-900">
+                    Connect wallet to MINT!
+                  </div>
+                )}
+
+                {candyMachine && (
+                  <div className=" tracking-widest font-bold text-sm pt-3 text-gray-400">
+                    {candyMachine?.state?.itemsRedeemed}/
+                    {candyMachine?.state?.itemsAvailable} claimed
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
-        
+
         <Snackbar
           open={alertState.open}
           autoHideDuration={6000}
