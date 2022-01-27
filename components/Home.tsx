@@ -337,7 +337,6 @@ const Home = (props: HomeProps) => {
       <Container style={{ marginTop: 100 }}>
         {candyMachineGoLive && wallet.connected ? (
           <div className="flex items-center justify-center">
-            <h1>hi</h1>
             <Countdown
               className="flex items-center justify-center"
               date={isSPLExists ? 1640199600000 : candyMachineGoLive}
